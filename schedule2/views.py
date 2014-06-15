@@ -25,3 +25,13 @@ def index(request):
 def aggregate(request):
     context = {}
     return render(request, 'schedules/timeData', context)
+
+def testPost(request):
+    print request
+    if request.method == 'POST':
+        cellRow = request.POST['cell row']
+        cellColumn = request.POST['cell column']
+        name = request.POST['name']
+        areas = request.POST['areas']
+
+    return HttpResponse("name: " + str(name) + "\nareas: " + str(areas))

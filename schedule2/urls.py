@@ -7,4 +7,6 @@ urlpatterns = patterns('',
         url(r'^$', views.index, name='index'),
         # ex: /schedules/aggreg
         url(r'aggregate/$', views.aggregate, name='aggregate'),
+        # ex: /schedules/testpost
+        url(r'^testPost/$', views.testPost, name='testPost'),
         )
