@@ -1,5 +1,6 @@
 $(document).ready(function() {
     var lastColumn = 8; // index of the last column
+    var firstRow = 0;
     var lastRow = 25; // index of the last row
 
     // initial settings for table creation
@@ -65,32 +66,55 @@ $(document).ready(function() {
         event.preventDefault();
     });
 
+    // adds disabled class to certain cells, specific for this institution
+    function disableCells() {
+        $( table.column(7).nodes() ).addClass('disabled');
+        
+        for (var rowIndex = firstRow; rowIndex < firstRow + 5; rowIndex++) {
+            $( table.cells(rowIndex, 6).nodes() ).addClass('disabled');
+        }
+
+        for (var rowIndex = lastRow - 11; rowIndex < lastRow; rowIndex++) {
+            $( table.cells(rowIndex, 6).nodes() ).addClass('disabled');
+        }
+
+        for (var rowIndex = lastRow - 5; rowIndex < lastRow; rowIndex++) {
+            $( table.cells(rowIndex, 5).nodes() ).addClass('disabled');
+        }
+    }
+
+    disableCells();
+
     // adds select class to a cell
-    function selectCell(cellObj) {
-        if ( !$( table.cell(cellObj).node() ).hasClass( 'time' )) {
-            $( table.cell(cellObj).node() ).addClass( 'select' );
+    function selectCell(rowIdx, colIdx) {
+        if ( !$( table.cells(rowIdx, colIdx).nodes() ).hasClass( 'time' ) &
+             !$( table.cells(rowIdx, colIdx).nodes() ).hasClass( 'disabled' )) {
+            $( table.cells(rowIdx, colIdx).nodes() ).addClass( 'select' );
         }
     }
 
     // removes select class from a cell
     function removeSelectCell(cellObj) {
-        $( table.cell(cellObj).node() ).removeClass( 'select' );
+        $( table.cells(cellObj).nodes() ).removeClass( 'select' );
     }
 
     // when a cell is clicked if it does not have select class calls 
     // selectCell()
     $('#schedule tbody').on( 'click', 'td', function() {
+        var colIdx = table.cell(this).index().column;
+        var rowIdx = table.cell(this).index().row;
+
         if ( $( table.cell(this).node() ).hasClass( 'select' )) {
             removeSelectCell(this);
         } else {
-            selectCell(this);
+            selectCell(rowIdx, colIdx);
         }
     } );
 
     // adds select class to a row of cells
-    function selectRowOfCells(rowId) {
+    function selectRowOfCells(rowIdx) {
         for (var i = 1; i < lastColumn; i++) {
-            $( table.cells(rowId, i).nodes() ).addClass( 'select' );
+            selectCell(rowIdx, i);
         }
     }
 
@@ -101,6 +125,15 @@ $(document).ready(function() {
         }
     }
 
+    function checkSelect(rowIdx, colIdx) {
+        if ( $( table.cells(rowIdx, colIdx).nodes() ).hasClass( 'select' ) ||
+             $( table.cells(rowIdx, colIdx).nodes() ).hasClass( 'disabled' ) ) {
+            return true;
+        }
+
+        return false;
+    }
+
     // selects a row of cells on click, deselects only if all cells in
     // row are already selected
     $('#schedule tbody').on( 'click', 'td.time', function() {
@@ -108,10 +141,8 @@ $(document).ready(function() {
         var selected = true;
 
         for (var columnIndex = 1; columnIndex < lastColumn; columnIndex++) {
-            var checkSelect = $( table.cells(rowIdx, columnIndex).nodes() )
-                                      .hasClass( 'select' );
 
-            if ( !checkSelect ) {
+            if ( !checkSelect(rowIdx, columnIndex) ) {
                 selected = false;
             }
         }
@@ -123,12 +154,12 @@ $(document).ready(function() {
         }
     });
 
-    // adds select class to a Column of cells
+    // adds select class to a column of cells
     function selectColumnOfCells(colId) {
         $( table.column(colId).nodes() ).addClass( 'select' );
     }
 
-    // removes select class from a row of cells
+    // removes select class from a column of cells
     function deselectColumnOfCells(colId) {
         $( table.column(colId).nodes() ).removeClass( 'select' );
     }
@@ -139,11 +170,9 @@ $(document).ready(function() {
         var colIdx = table.column(this).index();
         var selected = true;
 
-        for (var rowIndex = 1; rowIndex < lastRow; rowIndex++) {
-            var checkSelect = $( table.cells(rowIndex, colIdx).nodes() )
-                                      .hasClass( 'select' );
+        for (var rowIndex = 0; rowIndex < lastRow; rowIndex++) {
 
-            if ( !checkSelect ) {
+            if ( !checkSelect(rowIndex, colIdx) ){
                 selected = false;
             }
         }

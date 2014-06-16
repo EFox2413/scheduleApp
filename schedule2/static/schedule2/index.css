@@ -6,6 +6,10 @@
     -o-user-select: none;
 }
 
+td.disabled {
+    background-color: gray;
+}
+
 td.highlight {
     background-color: whitesmoke;
 }
