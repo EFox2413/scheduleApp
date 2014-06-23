@@ -11,17 +11,28 @@ class Employee(models.Model):
             ('T', 'Technology'),
             )
 
-    SUBAREA_CHOICES = (
+    MATH_SUBJECTS = (
             ('LIB', 'Liberal Arts Math'),
             ('ALG', 'College Algebra'),
+            )
+
+    SCIENCE_SUBJECTS = (
             ('CHM', 'General Chemistry'),
             ('PHY', 'College Physics'),
+            )
+
+    BUSINESS_SUBJECTS = (
             ('ECO', 'Economics'),
             ('ACC', 'Accounting'),
+            )
+
+    TECH_SUBJECTS = (
             ('TEC', 'Technical Support'),
             ('PRG', 'Computer Programming'),
             )
 
+    SUBAREA_CHOICES = (MATH_SUBJECTS + SCIENCE_SUBJECTS + BUSINESS_SUBJECTS +
+                       TECH_SUBJECTS)
 
     emp_id = models.IntegerField(default=0)
     name = models.CharField(max_length=50)

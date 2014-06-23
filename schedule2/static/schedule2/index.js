@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    var firstColumn = 0;
     var lastColumn = 8; // index of the last column
     var firstRow = 0;
     var lastRow = 25; // index of the last row
@@ -47,20 +48,57 @@ $(document).ready(function() {
         return false;
     }
 
+    $('#areas input').change(function(event) {
+        var id = $(this).attr('id');
+        //alert(id + " was changed");
+
+        // sends an AJAX  post request with data
+        $.post("makeSubList/",
+            {
+                subAreas: id[4],
+            },
+            function(data, status) {
+            });
+    });
+
     // Sends AJAX POST if all forms have acceptable submissions
     $('form').submit(function(event) {
         if (checkSubmission()) {
+
+            function formatText(obj) {
+            }
+
+            var areaValues = $('#areas li input:checkbox:checked').map(function() {
+                var str = $(this).next().text();
+                str = str.replace(/\s+/g, '');
+                return str;
+            }).get().join(', ');
+
+            var subAreaValues = $('#subAreas li input:checkbox:checked')
+              .map(function() {
+                var str = $(this).parent().text();
+                str = str.replace(/\s+/g, '');
+                return str;
+            }).get().join(', ');
+
+            var semesterValue = $('input[name=choice]:checked', '#employeeForm')
+              .map(function() {
+                var str = $(this).next().text();
+                str = str.replace(/\s+/g, '');
+                return str;
+            }).get().join('');
+
             // sends an AJAX  post request with data on cells selected
             // Name, Area, and Sub-Areas
             $.post("testPost/",
                 {
                     name: document.getElementById('nameInput').value,
-                    areas: document.getElementById('areaInput').value,
-                    'cell row': 3,
-                    'cell column': 5,
+                    'areas': areaValues,
+                    'subAreas': subAreaValues,
+                    'semester': semesterValue,
                 },
                 function(data, status) {
-                    $(".alert").alert(data, status);
+                    alert(data, status);
                 });
         }
         event.preventDefault();
@@ -156,12 +194,16 @@ $(document).ready(function() {
 
     // adds select class to a column of cells
     function selectColumnOfCells(colId) {
-        $( table.column(colId).nodes() ).addClass( 'select' );
+        for (var rowIndex = firstRow; rowIndex < lastRow; rowIndex++) {
+            selectCell(rowIndex, colId);
+        }
     }
 
     // removes select class from a column of cells
     function deselectColumnOfCells(colId) {
-        $( table.column(colId).nodes() ).removeClass( 'select' );
+        for (var rowIndex = firstRow; rowIndex < lastRow; rowIndex++) {
+            $( table.cells(rowIndex, colId).nodes() ).removeClass( 'select' );
+        }
     }
 
     // selects a column of cells on click, deselects only if all cells in
@@ -187,8 +229,8 @@ $(document).ready(function() {
 
     // adds select class to all cells
     function selectAllCells() {
-        for (var i = 1; i < lastColumn; i++) {
-            $( table.column(i).nodes() ).addClass( 'select' );
+        for (var colIndex = firstColumn; colIndex < lastColumn; colIndex++) {
+            selectColumnOfCells(colIndex);
         }
     }
 
@@ -220,12 +262,6 @@ $(document).ready(function() {
         var colIdx = table.cell(this).index().column;
         var rowIdx = table.cell(this).index().row;
         var lastIdx = null;
-
-        if ( colIdx !== lastIdx && colIdx !== 0 && rowIdx !== lastIdx ) {
-            $( table.cells().nodes() ).removeClass( 'highlight' );
-            $( table.column( colIdx ).nodes() ).addClass( 'highlight' );
-            $( table.row( rowIdx ).nodes() ).addClass( 'highlight' );
-        }
     } ); 
 
     // handles the unhighlighting of cells on mouseleave

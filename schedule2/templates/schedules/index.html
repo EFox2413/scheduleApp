@@ -36,15 +36,15 @@
 
     <!-- input form for name, and area --!>
     <div class="container">
-        <form name="employee form" role="form" class="form-inline">
+        <form id="employeeForm" role="form" class="form-inline">
             <div class="form-group pull-left">
                 <label for="nameInput">Name:</label>
-                <input type="text" class="form-control" id="nameInput" placeholder="Enter name">
+                <input type="text" class="form-control" id="nameInput" placeholder="Enter name" />
             </div>
 
             <!-- multi-select dropdown -->
             <div class="form-group col-xs-1">
-                <div class="dropdown">
+                <div class="dropdown" id="areas">
                     <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#">
                         Area
                         <b class="caret"></b>
@@ -52,8 +52,8 @@
                     <ul class="dropdown-menu dropdown-menu-form" role="menu">
                         {% for area in area_list %}
                         <li>
-                            <label class="checkbox">
-                                <input type="checkbox" id="areaInput">
+                            <input type="checkbox" class="areas" name="areas" id="area{{ forloop.counter }}" />
+                            <label for="area{{ forloop.counter }}" class="checkbox">
                                 {{ area }}
                             </label>
                         </li>
@@ -63,8 +63,8 @@
             </div>
 
             <!-- multiselect dropdown -->
-            <div class="form-group col-xs-3">
-                <div class="dropdown">
+            <div class="form-group">
+                <div class="dropdown" id="subAreas">
                     <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#">
                         Sub-Area
                         <b class="caret"></b>
@@ -78,6 +78,24 @@
                             </label>
                         </li>
                         {% endfor %}
+                    </ul>
+                </div>
+            </div>  
+
+           <!-- multiselect dropdown -->
+            <div class="form-group">
+                <div class="dropdown" id="semesters">
+                    <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#">
+                        Semester
+                        <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-form" role="menu">
+                    {% for semester in area_list %}
+                            <input name="choice" id="choice{{ forloop.counter }}" type="radio" />
+                            <label for="choice{{ forloop.counter }}" class="radiodial">
+                                {{ semester }}
+                            </label><br />
+                    {% endfor %}
                     </ul>
                 </div>
             </div>
