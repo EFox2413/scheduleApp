@@ -88,6 +88,27 @@ $(document).ready(function() {
                 return str;
             }).get().join('');
 
+            var availabilityValues = $('#schedule tbody')
+              .map(function() {
+                var availabilityTime = [];
+
+                for (var colIdx = firstColumn; colIdx < lastColumn; colIdx++) {
+                    for (var rowIdx = firstRow; rowIdx < lastRow; rowIdx++) {
+                        if ( $( table.cells(rowIdx, colIdx).nodes() )
+                                     .hasClass( 'select' ) ) {
+                            //get row, get column
+                            availabilityTime.push( 
+                                $( table.column( colIdx ).header() ).text() +
+                                " " +
+                                $( table.cells( rowIdx, firstColumn )
+                                        .nodes() ).text() 
+                                                                            );
+                        }
+                    }
+                }
+                return availabilityTime;
+            }).get().join(', ');
+
             // sends an AJAX  post request with data on cells selected
             // Name, Area, and Sub-Areas
             $.post("testPost/",
@@ -96,6 +117,7 @@ $(document).ready(function() {
                     'areas': areaValues,
                     'subAreas': subAreaValues,
                     'semester': semesterValue,
+                    'availability': availabilityValues,
                 },
                 function(data, status) {
                     alert(data, status);

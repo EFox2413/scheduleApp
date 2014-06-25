@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+<link rel="stylesheet" type="text/css" href="../../static/schedule2/lib/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="../../static/schedule2/lib/dataTables.bootstrap.css">
+
+<link rel="stylesheet" type="text/css" href="../../static/schedule2/index.css">
+
+</head>
+
+<body>
+    <!-- navigation bar, fixed to top --!>
+    <nav class="navbar navbar-default navbar-inverse" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <!-- Title of navbar -->
+          <a class="navbar-brand" href="#">Scheduling</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="">New</a></li>
+            <li><a href="overview">Overview</a></li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+
+<!-- spreadsheet-like table, with coloring for availability of employees -->
+{% if day_list %}
+    <div class="table-responsive">
+        <table id="schedule" class="table table-bordered table-condensed" cellspacing="0" width="100%">
+            <thead>
+                <td class="select-all"></td>
+                {% for day in day_list%}
+                    <td class="days" style="text-align:center">{{ day }}</td>
+                {% endfor %}
+            </thead>
+            <tbody>
+                {% for time in time_list %}
+                    <tr>
+                        <td class="time">{{ time }}</td>
+                        {% for day in day_list %}
+                            <td></td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>No days are in the database.</p>
+{% endif %}
+
+<script type="text/javascript" language="javascript" src="../../static/schedule2/lib/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="../../static/schedule2/lib/jquery.cookie.js"></script>
+<script type="text/javascript" language="javascript" src="../../static/schedule2/lib/bootstrap.js"></script>
+<script type="text/javascript" language="javascript" src="../../static/schedule2/lib/jquery.dataTables.js"></script>
+<script type="text/javascript" language="javascript" src="../../static/schedule2/lib/dataTables.bootstrap.js"></script>
+
+<script type="text/javascript" class="init" src="../../static/schedule2/overview.js"></script>
+
+</body>
+</html>

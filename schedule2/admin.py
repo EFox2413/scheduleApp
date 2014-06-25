@@ -9,7 +9,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     fieldsets = [
             (None,              {'fields': ['name']}), 
             (None,              {'fields': ['emp_id']}),
-            ('Knowledge Areas', {'fields': ['subject']}),
+            ('Knowledge Areas', {'fields': ['area']}),
             ]
     inlines = [AvailabilityInline]
 

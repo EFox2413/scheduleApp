@@ -37,10 +37,11 @@ class Employee(models.Model):
     emp_id = models.IntegerField(default=0)
     name = models.CharField(max_length=50)
     area = models.CharField(max_length = 1,
-                               choices = AREA_CHOICES,
-                               default = AREA_CHOICES[0][0])
+                            choices = AREA_CHOICES,
+                            default = AREA_CHOICES[0])
     subarea = models.CharField(max_length = 12,
-                               choices = SUBAREA_CHOICES)
+                               choices = SUBAREA_CHOICES,
+                               default = SUBAREA_CHOICES[0])
     
     def __unicode__(self):
         return self.name
@@ -70,34 +71,21 @@ class Availability(models.Model):
         return time_stack
 
     TIME_CHOICES = make_times()
-    
+    RTIME_CHOICES = (TIME_CHOICES, TIME_CHOICES)
+    SEMESTER_CHOICES = (
+            ('FA', 'Fall 2014'),
+            ('SP', 'Spring 2014'),
+            ('SU', 'Summer 2014'),
+            )
 
     employee = models.ForeignKey(Employee)
     day = models.CharField(max_length = 1,
                            choices = DAY_CHOICES,
                            default = DAY_CHOICES[0][0])
-    time_start = models.TimeField('start time of availability')
-    time_end = models.TimeField('end time of availability')
-
-    #formats the response of availability in a day and time range object
-    def format_day_time(self, input_day, input_start, input_end):
-        day = input_day
-        start = input_start
-        end = input_end
-
-        format_response = "%s: From %s to %s" % (day, start, end)
-
-        return format_response
-
-    def calc_time_delta(self, start, end):
-        time_range = end - start
-        return str(time_range)
+    time_start = models.CharField(max_length = 50)
+    semester = models.CharField(max_length = 2,
+                           choices = SEMESTER_CHOICES,
+                           default = SEMESTER_CHOICES[0])
 
     def __unicode__(self):
-        return self.format_day_time(self.day, self.time_start, self.time_end)
-
-    def is_available(self, hour):
-        if time_start < hour < time_end:
-            return "%s is available." % self.employee 
-
-        return "%s is not available." % self.employee
+        return self.format_day_time(self.day, self.time_start)
