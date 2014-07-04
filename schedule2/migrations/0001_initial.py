@@ -11,21 +11,26 @@ class Migration(SchemaMigration):
         # Adding model 'Employee'
         db.create_table(u'schedule2_employee', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('emp_id', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('area', self.gf('django.db.models.fields.CharField')(default=('M', 'Math'), max_length=1)),
-            ('subarea', self.gf('django.db.models.fields.CharField')(default=('LIB', 'Liberal Arts Math'), max_length=12)),
+            ('semester', self.gf('django.db.models.fields.CharField')(default=('FA', 'Fall 2014'), max_length=2)),
         ))
         db.send_create_signal(u'schedule2', ['Employee'])
+
+        # Adding model 'Area'
+        db.create_table(u'schedule2_area', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('employee', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['schedule2.Employee'])),
+            ('subarea', self.gf('django.db.models.fields.CharField')(default=('LIB', 'Liberal Arts Math'), max_length=12)),
+        ))
+        db.send_create_signal(u'schedule2', ['Area'])
 
         # Adding model 'Availability'
         db.create_table(u'schedule2_availability', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('employee', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['schedule2.Employee'])),
             ('day', self.gf('django.db.models.fields.CharField')(default='M', max_length=1)),
-            ('time_start', self.gf('django.db.models.fields.TimeField')()),
-            ('time_end', self.gf('django.db.models.fields.TimeField')()),
-            ('semester', self.gf('django.db.models.fields.CharField')(default=('FA', 'Fall 2014'), max_length=2)),
+            ('time_start', self.gf('django.db.models.fields.CharField')(max_length=8)),
+            ('time_end', self.gf('django.db.models.fields.CharField')(max_length=8)),
         ))
         db.send_create_signal(u'schedule2', ['Availability'])
 
@@ -34,27 +39,33 @@ class Migration(SchemaMigration):
         # Deleting model 'Employee'
         db.delete_table(u'schedule2_employee')
 
+        # Deleting model 'Area'
+        db.delete_table(u'schedule2_area')
+
         # Deleting model 'Availability'
         db.delete_table(u'schedule2_availability')
 
 
     models = {
+        u'schedule2.area': {
+            'Meta': {'object_name': 'Area'},
+            'employee': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['schedule2.Employee']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'subarea': ('django.db.models.fields.CharField', [], {'default': "('LIB', 'Liberal Arts Math')", 'max_length': '12'})
+        },
         u'schedule2.availability': {
             'Meta': {'object_name': 'Availability'},
             'day': ('django.db.models.fields.CharField', [], {'default': "'M'", 'max_length': '1'}),
             'employee': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['schedule2.Employee']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'semester': ('django.db.models.fields.CharField', [], {'default': "('FA', 'Fall 2014')", 'max_length': '2'}),
-            'time_end': ('django.db.models.fields.TimeField', [], {}),
-            'time_start': ('django.db.models.fields.TimeField', [], {})
+            'time_end': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
+            'time_start': ('django.db.models.fields.CharField', [], {'max_length': '8'})
         },
         u'schedule2.employee': {
             'Meta': {'object_name': 'Employee'},
-            'area': ('django.db.models.fields.CharField', [], {'default': "('M', 'Math')", 'max_length': '1'}),
-            'emp_id': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'subarea': ('django.db.models.fields.CharField', [], {'default': "('LIB', 'Liberal Arts Math')", 'max_length': '12'})
+            'semester': ('django.db.models.fields.CharField', [], {'default': "('FA', 'Fall 2014')", 'max_length': '2'})
         }
     }
 

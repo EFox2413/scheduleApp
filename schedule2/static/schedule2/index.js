@@ -65,26 +65,17 @@ $(document).ready(function() {
     $('form').submit(function(event) {
         if (checkSubmission()) {
 
-            function formatText(obj) {
-            }
-
-            var areaValues = $('#areas li input:checkbox:checked').map(function() {
-                var str = $(this).next().text();
-                str = str.replace(/\s+/g, '');
-                return str;
-            }).get().join(', ');
-
             var subAreaValues = $('#subAreas li input:checkbox:checked')
               .map(function() {
                 var str = $(this).parent().text();
-                str = str.replace(/\s+/g, '');
+                str = str.replace(/\s\s+/g, '');
                 return str;
-            }).get().join(', ');
+            }).get();
 
             var semesterValue = $('input[name=choice]:checked', '#employeeForm')
               .map(function() {
                 var str = $(this).next().text();
-                str = str.replace(/\s+/g, '');
+                str = str.replace(/\s\s+/g, '');
                 return str;
             }).get().join('');
 
@@ -92,32 +83,39 @@ $(document).ready(function() {
               .map(function() {
                 var availabilityTime = [];
 
-                for (var colIdx = firstColumn; colIdx < lastColumn; colIdx++) {
+                for (var colIdx = firstColumn + 1; colIdx < lastColumn; colIdx++) {
+                    var selectTracker = false;
+                    var weekDay = $( table.column( colIdx ).header() ).text();
+                    var timeString = "";
+
                     for (var rowIdx = firstRow; rowIdx < lastRow; rowIdx++) {
-                        if ( $( table.cells(rowIdx, colIdx).nodes() )
-                                     .hasClass( 'select' ) ) {
+                        var cellIsSelected = $( table.cells(rowIdx, colIdx).nodes() )
+                                                     .hasClass( 'select' );
+                        var cellTime = $( table.cells( rowIdx, firstColumn ).nodes() ).text();
+
+                        if ( cellIsSelected && !selectTracker ) {
+                            selectTracker = true;
+
                             //get row, get column
-                            availabilityTime.push( 
-                                $( table.column( colIdx ).header() ).text() +
-                                " " +
-                                $( table.cells( rowIdx, firstColumn )
-                                        .nodes() ).text() 
-                                                                            );
+                            timeString = weekDay + " " + cellTime;
+                        } else if ( !cellIsSelected && selectTracker ) {
+                            selectTracker = false;
+                            timeString = timeString + " " + cellTime;
+                            availabilityTime.push(timeString);
                         }
                     }
                 }
                 return availabilityTime;
-            }).get().join(', ');
+            }).get();
 
             // sends an AJAX  post request with data on cells selected
             // Name, Area, and Sub-Areas
             $.post("testPost/",
                 {
-                    name: document.getElementById('nameInput').value,
-                    'areas': areaValues,
-                    'subAreas': subAreaValues,
+                    'name': document.getElementById('nameInput').value,
+                    'subArea[]': subAreaValues,
                     'semester': semesterValue,
-                    'availability': availabilityValues,
+                    'availability[]': availabilityValues,
                 },
                 function(data, status) {
                     alert(data, status);
@@ -130,16 +128,24 @@ $(document).ready(function() {
     function disableCells() {
         $( table.column(7).nodes() ).addClass('disabled');
         
+        // saturday
         for (var rowIndex = firstRow; rowIndex < firstRow + 5; rowIndex++) {
             $( table.cells(rowIndex, 6).nodes() ).addClass('disabled');
         }
 
+        // saturday
         for (var rowIndex = lastRow - 11; rowIndex < lastRow; rowIndex++) {
             $( table.cells(rowIndex, 6).nodes() ).addClass('disabled');
         }
 
+        // for friday
         for (var rowIndex = lastRow - 5; rowIndex < lastRow; rowIndex++) {
             $( table.cells(rowIndex, 5).nodes() ).addClass('disabled');
+        }
+        
+        // last row of each column, except for time column
+        for (var colIndex = firstColumn + 1; colIndex < lastColumn; colIndex++) {
+            $( table.cells(lastRow - 1, colIndex).nodes() ).addClass('disabled');
         }
     }
 
