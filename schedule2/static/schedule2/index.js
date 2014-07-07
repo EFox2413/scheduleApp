@@ -113,9 +113,9 @@ $(document).ready(function() {
             $.post("testPost/",
                 {
                     'name': document.getElementById('nameInput').value,
-                    'subArea[]': subAreaValues,
+                    'subArea': subAreaValues,
                     'semester': semesterValue,
-                    'availability[]': availabilityValues,
+                    'availability': availabilityValues,
                 },
                 function(data, status) {
                     alert(data, status);
