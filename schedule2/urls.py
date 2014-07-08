@@ -13,4 +13,6 @@ urlpatterns = patterns('',
         url(r'^testPost/$', views.testPost, name='testPost'),
         # ex: /schedules/submit
         url(r'^submit/$', views.submit, name='submit'),
+        # ex: /schedules/overview/data
+        url(r'overview/data/$', views.overviewGetData, name='data'),
         )

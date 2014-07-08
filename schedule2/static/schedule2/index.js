@@ -84,6 +84,8 @@ $(document).ready(function() {
                 var availabilityTime = [];
 
                 for (var colIdx = firstColumn + 1; colIdx < lastColumn; colIdx++) {
+                    // selectTracker is used to check if there is an end to
+//                     consecutive selected cells
                     var selectTracker = false;
                     var weekDay = $( table.column( colIdx ).header() ).text();
                     var timeString = "";

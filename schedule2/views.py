@@ -48,15 +48,58 @@ def submit(request):
 #for /schedules/overview
 def overview(request):
     #day_list return list of day names without abbreviations
-    day_list = [x[1] for x in Availability.DAY_CHOICES]
+    day_list = [day[1] for day in Availability.DAY_CHOICES]
     #time_list returns the available time choices, hardcoded into models.py
-    time_list = Availability.TIME_CHOICES
+    time_list = [time[1] for time in Availability.TIME_CHOICES]
 
     context = {
                 'day_list': day_list,
                 'time_list': time_list,
               }
+
     return render(request, 'schedules/overview.html', context)
+
+def overviewGetData(request):
+    if request.method == 'GET':
+        message = []
+
+        for employee in Employee.objects.all():
+            name = employee.name
+            areas = ""
+            
+            for subarea in employee.area_set.all():
+                for subject in Area.MATH_SUBJECTS:
+                    if subarea.subarea == subject[0]:
+                        areas += "M"
+                for subject in Area.SCIENCE_SUBJECTS:
+                    if subarea.subarea == subject[0]:
+                        areas += "S"
+                for subject in Area.BUSINESS_SUBJECTS:
+                    if subarea.subarea == subject[0]:
+                        areas += "B"
+                for subject in Area.TECH_SUBJECTS:
+                    if subarea.subarea == subject[0]:
+                        areas += "T"
+
+            for availability in employee.availability_set.all():
+                timeStart = availability.time_start
+                timeEnd = availability.time_end
+                dayName = ""
+
+                for day in Availability.DAY_CHOICES:
+                    if availability.day == day[0]:
+                        dayName = day[1]
+
+
+                message.append(name + ",")
+                message.append(dayName + "," + timeStart.strftime("%I:%M %p") + "," + timeEnd.strftime("%I:%M %p") + ",")
+                message.append(areas)
+                message.append("\n")
+
+    else:
+        message = "Request failed"
+
+    return HttpResponse( message )
 
 #updates subarea list based on areas list, AJAX
 def makeSubList(request):
@@ -76,13 +119,14 @@ def makeSubList(request):
     return HttpResponse("subAreas: " + subAreas)
 
 # AJAX for seeing if data is correctly submitted
+# should probably refactor this to something different than testPost
 def testPost(request):
     print request
     if request.method == 'POST':
         reqName = request.POST['name']
-        reqSubAreas = request.POST['subArea[]']
+        reqSubAreas = request.POST.getlist('subArea[]')
         reqSemester = request.POST['semester']
-        reqAvailability = request.POST['availability[]']
+        reqAvailability = request.POST.getlist('availability[]')
 
         for x in Employee.SEMESTER_CHOICES:
             if reqSemester == x[1]:
@@ -98,21 +142,23 @@ def testPost(request):
 
         for availability in reqAvailability:
             timeArray = availability.split(" ")
+            dayInput = timeArray[0]
+            timeStartInput = timeArray[1] + " " + timeArray[2]
+            timeEndInput = timeArray[3] + " " + timeArray[4]
 
-            for x in Availability.DAY_CHOICES:
-                if timeArray[0] == x[1]:
-                    reqDay = x[0]
+            for day in Availability.DAY_CHOICES:
+                if dayInput == day[1]:
+                    reqDay = day[0]
 
-            for x in Availability.TIME_CHOICES:
-                if timeArray[1] == x[1]:
-                    reqTimeStart = x[0]
-                if timeArray[2] == x[1]:
-                    reqTimeEnd = x[0]
+            for time in Availability.TIME_CHOICES:
+                if timeStartInput == time[1]:
+                    reqTimeStart = time[0]
+                if timeEndInput == time[1]:
+                    reqTimeEnd = time[0]
 
             empObj.availability_set.create(day=reqDay, time_start=reqTimeStart, time_end=reqTimeEnd)
 
-
     return HttpResponse("name: " + reqName + 
-                        "\nsubAreas: " + reqSubAreas +
+                        "\nsubAreas: " + reqSubAreas[0] +
                         "\nsemester: " + reqSemester +
-                        "\navailability: \n" + reqAvailability)
+                        "\navailability: \n" + reqAvailability[0])

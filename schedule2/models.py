@@ -70,9 +70,9 @@ class Availability(models.Model):
         for i in range(7, 20):
             for x in range(0, 2):
                 if x == 0 and not i == 7:
-                    time_tuple += ((time(i).strftime("%H:%M:%S"), time(i).strftime("%I:%M %p")),)
+                    time_tuple += ((time(i), time(i).strftime("%I:%M %p")),)
                 elif x == 1:
-                    time_tuple += ((time(i, 30).strftime("%H:%M:%S"), time(i, 30).strftime("%I:%M %p")),)
+                    time_tuple += ((time(i, 30), time(i, 30).strftime("%I:%M %p")),)
         return time_tuple
 
     TIME_CHOICES = make_times()
@@ -81,15 +81,11 @@ class Availability(models.Model):
     day = models.CharField(max_length = 1,
                            choices = DAY_CHOICES,
                            default = DAY_CHOICES[0][0])
-    time_start = models.CharField(max_length = 8,
-                           choices = TIME_CHOICES,
-                           )
-    time_end = models.CharField(max_length = 8,
-                           choices = TIME_CHOICES,
-                           )
+    time_start = models.TimeField(choices = TIME_CHOICES)
+    time_end = models.TimeField(choices = TIME_CHOICES)
 
     def __unicode__(self):
-        returnString = ("Day: " + self.day + " Beg: " + self.time_start + 
-                     " End: " + self.time_end)
+        returnString = ("Day: " + self.day + " Beg: " + self.time_start.strftime("%I:%M %p") + 
+                     " End: " + self.time_end.strftime("%I:%M %p"))
 
         return returnString

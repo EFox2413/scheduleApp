@@ -31,6 +31,47 @@ $(document).ready(function() {
         }
     });
     
+    //populates cells with tutor names based on inputs
+    function populateCells(name, day, start, end) {
+        column = null;
+        rowStart = null;
+        rowEnd = null;
+
+        for (var colIdx = firstColumn + 1; colIdx < lastColumn; colIdx++) {
+            if ( day == $( table.column( colIdx ).header() ).text() ) {
+                column = colIdx;
+            }
+        }
+
+        for (var rowIdx = firstRow; rowIdx < lastRow; rowIdx++) {
+            if ( start == $( table.cells(rowIdx, firstColumn).nodes() ).text() ) {
+                rowStart = rowIdx
+            }
+            if ( end == $( table.cells(rowIdx, firstColumn).nodes() ).text() ) {
+                rowEnd = rowIdx
+            }
+        }
+
+        for (var rowIdx = rowStart; rowIdx < rowEnd; rowIdx++) {
+            if (name != null && column != null && rowStart != null) {
+                $( table.cells(rowIdx, column).nodes() ).append(name + ", ");
+            }
+        }
+    }
+
+    // gets data using AJAX GET request
+    $.get("data/", function(response, status) {
+        responseArray = response.split("\n");
+        itemArray = [];
+
+        for (var i in responseArray) {
+            alert(responseArray[i]);
+            item = responseArray[i].split(",");
+            populateCells(item[0], item[1], item[2], item[3]);
+        }
+
+    });
+
     // adds disabled class to certain cells, specific for this institution
     function disableCells() {
         $( table.column(7).nodes() ).addClass('disabled');
@@ -45,6 +86,11 @@ $(document).ready(function() {
 
         for (var rowIndex = lastRow - 5; rowIndex < lastRow; rowIndex++) {
             $( table.cells(rowIndex, 5).nodes() ).addClass('disabled');
+        }
+
+        // last row of each column, except for time column
+        for (var colIndex = firstColumn + 1; colIndex < lastColumn; colIndex++) {
+            $( table.cells(lastRow - 1, colIndex).nodes() ).addClass('disabled');
         }
     }
 
